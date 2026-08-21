@@ -5,79 +5,64 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
+import io.github.karlquerel.workout.R
 import io.github.karlquerel.workout.data.Effort
 import io.github.karlquerel.workout.data.Muscle
 
-val Void = Color(0xFF000000)
-val Panel = Color(0xFF0D0D0D)
-val Ink = Color(0xFFE8E8E8)
-val Dim = Color(0xFF8A8A8A)
-val Outline = Color(0xFF2A2A2A)
-val Green = Color(0xFF50FA7B)
-val Yellow = Color(0xFFF1FA8C)
-val Red = Color(0xFFFF5555)
-val Orange = Color(0xFFFFB86C)
-val Purple = Color(0xFFBD93F9)
-val Cyan = Color(0xFF8BE9FD)
-val Blue = Color(0xFF6EA8FF)
-val Pink = Color(0xFFFF79C6)
-val Tan = Color(0xFFCFA97E)
+// Dark gym console: near-black ground, one energetic accent, color-coded muscles.
+val Bg = Color(0xFF0B0F14)
+val CardBg = Color(0xFF151C24)
+val InkHi = Color(0xFFE8EDF3)
+val Dim = Color(0xFF8B98A7)
+val Line = Color(0xFF243039)
+val Accent = Color(0xFF4ADE80)
+val Warn = Color(0xFFF5C842)
+val Danger = Color(0xFFF87171)
+
+// Pixel display font — reserved for the timer digits and the brand mark.
+val PixelFont = FontFamily(Font(R.font.vt323))
 
 fun muscleColor(muscle: Muscle): Color = when (muscle) {
-	Muscle.CHEST -> Red
-	Muscle.BACK -> Blue
-	Muscle.TRICEPS -> Orange
-	Muscle.BICEPS -> Purple
-	Muscle.SHOULDERS -> Yellow
-	Muscle.LEGS -> Green
-	Muscle.ABS -> Cyan
-	Muscle.WAIST -> Pink
-	Muscle.FOREARMS -> Tan
+	Muscle.CHEST -> Color(0xFF3B9EFF)
+	Muscle.BACK -> Color(0xFFFF7C38)
+	Muscle.TRICEPS -> Color(0xFFB56BFF)
+	Muscle.BICEPS -> Color(0xFF2FCC8B)
+	Muscle.SHOULDERS -> Color(0xFFFF4F8B)
+	Muscle.LEGS -> Color(0xFFF5C842)
+	Muscle.ABS -> Color(0xFF35D4FF)
+	Muscle.WAIST -> Color(0xFF9EFF6B)
+	Muscle.FOREARMS -> Color(0xFFFFB347)
 }
 
 fun effortColor(effort: Effort): Color = when (effort) {
-	Effort.EASY -> Green
-	Effort.MEDIUM -> Yellow
-	Effort.HARD -> Red
+	Effort.EASY -> Color(0xFF2FCC8B)
+	Effort.MEDIUM -> Warn
+	Effort.HARD -> Danger
 }
 
-private val base = Typography()
-
-private val MonoTypography = Typography(
-	headlineLarge = base.headlineLarge.copy(fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold),
-	titleLarge = base.titleLarge.copy(fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold),
-	titleMedium = base.titleMedium.copy(fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold),
-	bodyLarge = base.bodyLarge.copy(fontFamily = FontFamily.Monospace),
-	bodyMedium = base.bodyMedium.copy(fontFamily = FontFamily.Monospace),
-	bodySmall = base.bodySmall.copy(fontFamily = FontFamily.Monospace),
-	labelLarge = base.labelLarge.copy(fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold),
-	labelMedium = base.labelMedium.copy(fontFamily = FontFamily.Monospace),
-	labelSmall = base.labelSmall.copy(fontFamily = FontFamily.Monospace),
-)
-
-private val VoidColorScheme = darkColorScheme(
-	primary = Green,
-	onPrimary = Void,
-	secondary = Yellow,
-	onSecondary = Void,
-	background = Void,
-	onBackground = Ink,
-	surface = Panel,
-	onSurface = Ink,
-	surfaceVariant = Panel,
+private val ConsoleColorScheme = darkColorScheme(
+	primary = Accent,
+	onPrimary = Color(0xFF03240F),
+	secondary = Warn,
+	onSecondary = Color(0xFF2A2005),
+	background = Bg,
+	onBackground = InkHi,
+	surface = CardBg,
+	onSurface = InkHi,
+	surfaceVariant = CardBg,
 	onSurfaceVariant = Dim,
-	outline = Outline,
-	error = Red,
-	onError = Void,
+	outline = Line,
+	error = Danger,
+	onError = Color(0xFF300B0B),
 )
 
 @Composable
 fun WorkoutTheme(content: @Composable () -> Unit) {
 	MaterialTheme(
-		colorScheme = VoidColorScheme,
-		typography = MonoTypography,
+		colorScheme = ConsoleColorScheme,
+		typography = Typography(),
 		content = content,
 	)
 }

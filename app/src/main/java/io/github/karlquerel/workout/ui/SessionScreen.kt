@@ -5,6 +5,7 @@ import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -38,10 +40,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.karlquerel.workout.WorkoutApp
 import io.github.karlquerel.workout.data.Block
 import io.github.karlquerel.workout.data.Exercise
@@ -52,14 +56,13 @@ import io.github.karlquerel.workout.data.db.SessionEntity
 import io.github.karlquerel.workout.data.db.SetLogEntity
 import io.github.karlquerel.workout.data.db.WorkoutDao
 import io.github.karlquerel.workout.timer.RestTimer
-import io.github.karlquerel.workout.ui.theme.Cyan
+import io.github.karlquerel.workout.ui.theme.Accent
+import io.github.karlquerel.workout.ui.theme.CardBg
+import io.github.karlquerel.workout.ui.theme.Danger
 import io.github.karlquerel.workout.ui.theme.Dim
-import io.github.karlquerel.workout.ui.theme.Green
-import io.github.karlquerel.workout.ui.theme.Orange
-import io.github.karlquerel.workout.ui.theme.Outline
-import io.github.karlquerel.workout.ui.theme.Panel
-import io.github.karlquerel.workout.ui.theme.Red
-import io.github.karlquerel.workout.ui.theme.Yellow
+import io.github.karlquerel.workout.ui.theme.Line
+import io.github.karlquerel.workout.ui.theme.PixelFont
+import io.github.karlquerel.workout.ui.theme.Warn
 import io.github.karlquerel.workout.ui.theme.effortColor
 import io.github.karlquerel.workout.ui.theme.muscleColor
 import kotlinx.coroutines.delay
@@ -96,6 +99,7 @@ fun SessionScreen(dayId: String, onExit: () -> Unit) {
 	var blockIndex by rememberSaveable { mutableIntStateOf(0) }
 	val block = day.blocks[blockIndex]
 	val isLast = blockIndex == day.blocks.lastIndex
+	val accent = muscleColor(day.accent)
 
 	val finish: () -> Unit = {
 		RestTimer.cancel(context)
@@ -112,20 +116,43 @@ fun SessionScreen(dayId: String, onExit: () -> Unit) {
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(horizontal = 16.dp, vertical = 12.dp),
+				.padding(horizontal = 20.dp, vertical = 12.dp),
 			horizontalArrangement = Arrangement.SpaceBetween,
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			Column {
-				Text(day.kind, style = MaterialTheme.typography.titleMedium)
 				Text(
-					"block ${blockIndex + 1}/${day.blocks.size}",
+					day.kind,
+					style = MaterialTheme.typography.titleLarge,
+					fontWeight = FontWeight.Bold,
+				)
+				Text(
+					"block ${blockIndex + 1} of ${day.blocks.size}",
 					style = MaterialTheme.typography.bodySmall,
 					color = Dim,
 				)
 			}
-			TextButton(onClick = finish) { Text("END", color = Red) }
+			TextButton(onClick = finish) { Text("End", color = Danger) }
 		}
+
+		// One segment per block — where you are in the session at a glance.
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(horizontal = 20.dp),
+			horizontalArrangement = Arrangement.spacedBy(4.dp),
+		) {
+			day.blocks.indices.forEach { i ->
+				Box(
+					Modifier
+						.weight(1f)
+						.height(4.dp)
+						.clip(RoundedCornerShape(2.dp))
+						.background(if (i <= blockIndex) accent else Line)
+				)
+			}
+		}
+		Spacer(Modifier.height(12.dp))
 
 		RestBar()
 
@@ -133,15 +160,15 @@ fun SessionScreen(dayId: String, onExit: () -> Unit) {
 			modifier = Modifier
 				.weight(1f)
 				.verticalScroll(rememberScrollState())
-				.padding(horizontal = 16.dp),
+				.padding(horizontal = 20.dp),
 		) {
 			when (block) {
 				is Single -> ExerciseCard(block.exercise, sessionId, dao)
 				is Superset -> {
 					Text(
-						"SUPERSET — alternate A ↔ B",
-						style = MaterialTheme.typography.labelMedium,
-						color = Yellow,
+						"Superset — alternate A ↔ B",
+						style = MaterialTheme.typography.labelLarge,
+						color = Warn,
 					)
 					Spacer(Modifier.height(8.dp))
 					ExerciseCard(block.a, sessionId, dao, step = "A")
@@ -154,32 +181,30 @@ fun SessionScreen(dayId: String, onExit: () -> Unit) {
 
 		if (!isLast) {
 			Text(
-				"next up: ${blockName(day.blocks[blockIndex + 1])}",
+				"next up · ${blockName(day.blocks[blockIndex + 1])}",
 				style = MaterialTheme.typography.bodySmall,
 				color = Dim,
-				modifier = Modifier.padding(horizontal = 16.dp),
+				modifier = Modifier.padding(horizontal = 20.dp),
 			)
 		}
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(16.dp),
+				.padding(horizontal = 20.dp, vertical = 14.dp),
 			horizontalArrangement = Arrangement.spacedBy(12.dp),
 		) {
 			OutlinedButton(
 				onClick = { blockIndex-- },
 				enabled = blockIndex > 0,
-				shape = RectangleShape,
 				modifier = Modifier.weight(1f),
 			) {
-				Text("◀ PREV")
+				Text("◀ Prev")
 			}
 			Button(
 				onClick = { if (isLast) finish() else blockIndex++ },
-				shape = RectangleShape,
 				modifier = Modifier.weight(1f),
 			) {
-				Text(if (isLast) "FINISH" else "NEXT ▶")
+				Text(if (isLast) "Finish" else "Next ▶")
 			}
 		}
 	}
@@ -204,26 +229,34 @@ private fun RestBar() {
 	}
 
 	val remaining = (((r.endAt - nowMs + 999) / 1000).toInt()).coerceAtLeast(0)
+	val urgent = remaining <= 5
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(horizontal = 16.dp)
-			.border(2.dp, Green)
-			.background(Panel)
-			.padding(12.dp),
+			.padding(horizontal = 20.dp)
+			.clip(RoundedCornerShape(14.dp))
+			.background(CardBg)
+			.border(1.dp, if (urgent) Danger else Accent, RoundedCornerShape(14.dp))
+			.padding(14.dp),
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
-		Text("REST — ${r.label}", style = MaterialTheme.typography.labelMedium, color = Dim)
-		Text(fmtClock(remaining), style = MaterialTheme.typography.headlineLarge, color = Green)
-		Spacer(Modifier.height(8.dp))
+		Text("rest · ${r.label}", style = MaterialTheme.typography.labelMedium, color = Dim)
+		Text(
+			fmtClock(remaining),
+			fontFamily = PixelFont,
+			fontSize = 72.sp,
+			color = if (urgent) Danger else Accent,
+		)
+		Spacer(Modifier.height(6.dp))
 		LinearProgressIndicator(
 			progress = { remaining.toFloat() / r.totalSeconds },
 			modifier = Modifier.fillMaxWidth(),
-			color = Green,
-			trackColor = Outline,
+			color = if (urgent) Danger else Accent,
+			trackColor = Line,
 		)
-		TextButton(onClick = { RestTimer.cancel(context) }) { Text("SKIP", color = Dim) }
+		TextButton(onClick = { RestTimer.cancel(context) }) { Text("Skip", color = Dim) }
 	}
+	Spacer(Modifier.height(12.dp))
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -237,16 +270,11 @@ private fun ExerciseCard(
 	val context = LocalContext.current
 	val accent = muscleColor(exercise.muscle)
 
-	Column(
-		modifier = Modifier
-			.fillMaxWidth()
-			.border(2.dp, accent)
-			.background(Panel)
-			.padding(14.dp),
-	) {
+	AccentCard(accent = accent) {
 		Text(
-			text = (step?.let { "[$it] " } ?: "") + exercise.name,
+			text = (step?.let { "$it · " } ?: "") + exercise.name,
 			style = MaterialTheme.typography.titleMedium,
+			fontWeight = FontWeight.Bold,
 		)
 		Spacer(Modifier.height(8.dp))
 		FlowRow(
@@ -255,17 +283,17 @@ private fun ExerciseCard(
 		) {
 			Chip(exercise.muscle.label.lowercase(), accent)
 			Chip(exercise.effort.label.lowercase(), effortColor(exercise.effort))
-			if (exercise.dropSet) Chip("drop set", Orange)
+			if (exercise.dropSet) Chip("drop set", Warn)
 			Chip(
 				if (exercise.isWarmup) "for ${fmtClock(exercise.restSeconds)}"
 				else "rest ${fmtClock(exercise.restSeconds)}",
-				Cyan,
+				Dim,
 			)
 		}
 		Spacer(Modifier.height(10.dp))
 		exercise.cues.forEach { cue ->
 			Text(
-				"› ${cue.title} — ${cue.text}",
+				"•  ${cue.title} — ${cue.text}",
 				style = MaterialTheme.typography.bodySmall,
 				color = Dim,
 			)
@@ -276,10 +304,9 @@ private fun ExerciseCard(
 			Spacer(Modifier.height(10.dp))
 			Button(
 				onClick = { RestTimer.start(context, exercise.restSeconds, exercise.name) },
-				shape = RectangleShape,
 				modifier = Modifier.fillMaxWidth(),
 			) {
-				Text("START ${fmtClock(exercise.restSeconds)} TIMER")
+				Text("Start ${fmtClock(exercise.restSeconds)} timer")
 			}
 		} else {
 			SetLogger(exercise, sessionId, dao)
@@ -314,13 +341,13 @@ private fun SetLogger(
 
 	Spacer(Modifier.height(10.dp))
 	Text(
-		text = "last time: " +
+		text = "last time · " +
 			if (lastTime.isEmpty()) "—"
-			else lastTime.joinToString("  ") { fmtSet(it.weightKg, it.reps) },
+			else lastTime.joinToString("   ") { fmtSet(it.weightKg, it.reps) },
 		style = MaterialTheme.typography.bodySmall,
 		color = Dim,
 	)
-	Spacer(Modifier.height(8.dp))
+	Spacer(Modifier.height(6.dp))
 
 	logged.forEachIndexed { index, set ->
 		Row(
@@ -329,9 +356,10 @@ private fun SetLogger(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			Text(
-				"set ${index + 1}   ${fmtSet(set.weightKg, set.reps)}",
-				style = MaterialTheme.typography.bodyMedium,
-				color = Green,
+				"set ${index + 1}    ${fmtSet(set.weightKg, set.reps)}",
+				style = MaterialTheme.typography.bodyLarge,
+				fontWeight = FontWeight.SemiBold,
+				color = Accent,
 			)
 			TextButton(
 				onClick = {
@@ -346,6 +374,7 @@ private fun SetLogger(
 		}
 	}
 
+	Spacer(Modifier.height(4.dp))
 	Row(
 		modifier = Modifier.fillMaxWidth(),
 		horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -357,7 +386,6 @@ private fun SetLogger(
 			label = { Text("kg") },
 			singleLine = true,
 			keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-			shape = RectangleShape,
 			modifier = Modifier.weight(1f),
 		)
 		OutlinedTextField(
@@ -366,7 +394,6 @@ private fun SetLogger(
 			label = { Text("reps") },
 			singleLine = true,
 			keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-			shape = RectangleShape,
 			modifier = Modifier.weight(1f),
 		)
 		Button(
@@ -389,9 +416,8 @@ private fun SetLogger(
 				}
 			},
 			enabled = sessionId != null && (repsText.toIntOrNull() ?: 0) > 0,
-			shape = RectangleShape,
 		) {
-			Text("LOG")
+			Text("Log")
 		}
 	}
 }

@@ -1,8 +1,5 @@
 package io.github.karlquerel.workout.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,16 +25,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.karlquerel.workout.WorkoutApp
 import io.github.karlquerel.workout.data.dayById
 import io.github.karlquerel.workout.data.db.SessionEntity
 import io.github.karlquerel.workout.data.db.SetLogEntity
+import io.github.karlquerel.workout.ui.theme.Accent
+import io.github.karlquerel.workout.ui.theme.Danger
 import io.github.karlquerel.workout.ui.theme.Dim
-import io.github.karlquerel.workout.ui.theme.Green
-import io.github.karlquerel.workout.ui.theme.Outline
-import io.github.karlquerel.workout.ui.theme.Panel
-import io.github.karlquerel.workout.ui.theme.Red
 import io.github.karlquerel.workout.ui.theme.muscleColor
 import java.time.Instant
 import java.time.ZoneId
@@ -64,20 +60,24 @@ fun HistoryScreen(onBack: () -> Unit) {
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
-			.padding(16.dp),
+			.padding(20.dp),
 	) {
 		Row(
 			modifier = Modifier.fillMaxWidth(),
 			horizontalArrangement = Arrangement.SpaceBetween,
 			verticalAlignment = Alignment.CenterVertically,
 		) {
-			Text("LOG HISTORY", style = MaterialTheme.typography.titleLarge)
-			TextButton(onClick = onBack) { Text("BACK", color = Dim) }
+			Text(
+				"History",
+				style = MaterialTheme.typography.titleLarge,
+				fontWeight = FontWeight.Bold,
+			)
+			TextButton(onClick = onBack) { Text("Back", color = Dim) }
 		}
 		Spacer(Modifier.height(12.dp))
 
 		if (sessions.isEmpty()) {
-			Text("no sessions logged yet", style = MaterialTheme.typography.bodyMedium, color = Dim)
+			Text("No sessions logged yet.", style = MaterialTheme.typography.bodyMedium, color = Dim)
 		}
 
 		LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -116,14 +116,7 @@ private fun SessionRow(
 		.atZone(ZoneId.systemDefault())
 		.format(DATE_FMT)
 
-	Column(
-		modifier = Modifier
-			.fillMaxWidth()
-			.border(2.dp, if (expanded) accent else Outline)
-			.background(Panel)
-			.clickable(onClick = onToggle)
-			.padding(12.dp),
-	) {
+	AccentCard(accent = accent, onClick = onToggle) {
 		Row(
 			modifier = Modifier.fillMaxWidth(),
 			horizontalArrangement = Arrangement.SpaceBetween,
@@ -134,20 +127,24 @@ private fun SessionRow(
 		}
 
 		if (expanded) {
-			Spacer(Modifier.height(8.dp))
+			Spacer(Modifier.height(10.dp))
 			if (sets.isEmpty()) {
-				Text("no sets logged", style = MaterialTheme.typography.bodySmall, color = Dim)
+				Text("No sets logged.", style = MaterialTheme.typography.bodySmall, color = Dim)
 			}
 			sets.groupBy { it.exerciseName }.forEach { (name, list) ->
-				Text(name, style = MaterialTheme.typography.labelMedium)
 				Text(
-					list.joinToString("  ") { fmtSet(it.weightKg, it.reps) },
-					style = MaterialTheme.typography.bodySmall,
-					color = Green,
+					name,
+					style = MaterialTheme.typography.labelLarge,
+					fontWeight = FontWeight.SemiBold,
+				)
+				Text(
+					list.joinToString("   ") { fmtSet(it.weightKg, it.reps) },
+					style = MaterialTheme.typography.bodyMedium,
+					color = Accent,
 				)
 				Spacer(Modifier.height(6.dp))
 			}
-			TextButton(onClick = onDelete) { Text("DELETE SESSION", color = Red) }
+			TextButton(onClick = onDelete) { Text("Delete session", color = Danger) }
 		}
 	}
 }
