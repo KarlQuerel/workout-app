@@ -1,5 +1,6 @@
 package io.github.karlquerel.workout.ui
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,6 +43,7 @@ import java.util.Locale
 import kotlinx.coroutines.launch
 
 private val DATE_FMT = DateTimeFormatter.ofPattern("EEE d MMM yyyy · HH:mm", Locale.ENGLISH)
+private val EXPORT_DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm", Locale.ENGLISH)
 
 @Composable
 fun HistoryScreen(onBack: () -> Unit) {
@@ -72,7 +74,34 @@ fun HistoryScreen(onBack: () -> Unit) {
 				style = MaterialTheme.typography.titleLarge,
 				fontWeight = FontWeight.Bold,
 			)
-			TextButton(onClick = onBack) { Text("Back", color = Dim) }
+			Row {
+				TextButton(
+					onClick = {
+						scope.launch {
+							val sets = dao.allSets()
+							if (sets.isEmpty()) return@launch
+							val csv = buildString {
+								appendLine("date,exercise,weight_kg,reps")
+								sets.forEach { set ->
+									val date = Instant.ofEpochMilli(set.loggedAt)
+										.atZone(ZoneId.systemDefault())
+										.format(EXPORT_DATE_FMT)
+									appendLine("$date,${set.exerciseName},${set.weightKg},${set.reps}")
+								}
+							}
+							val send = Intent(Intent.ACTION_SEND).apply {
+								type = "text/plain"
+								putExtra(Intent.EXTRA_SUBJECT, "split workout log")
+								putExtra(Intent.EXTRA_TEXT, csv)
+							}
+							context.startActivity(Intent.createChooser(send, "Export log"))
+						}
+					},
+				) {
+					Text("Export", color = Dim)
+				}
+				TextButton(onClick = onBack) { Text("Back", color = Dim) }
+			}
 		}
 		Spacer(Modifier.height(12.dp))
 

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -41,7 +44,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -52,6 +57,7 @@ import io.github.karlquerel.workout.data.Exercise
 import io.github.karlquerel.workout.data.Single
 import io.github.karlquerel.workout.data.Superset
 import io.github.karlquerel.workout.data.dayById
+import io.github.karlquerel.workout.data.db.ProgressPoint
 import io.github.karlquerel.workout.data.db.SessionEntity
 import io.github.karlquerel.workout.data.db.SetLogEntity
 import io.github.karlquerel.workout.data.db.WorkoutDao
@@ -80,11 +86,11 @@ fun SessionScreen(dayId: String, onExit: () -> Unit) {
 	val dao = remember { (context.applicationContext as WorkoutApp).database.dao() }
 	val scope = rememberCoroutineScope()
 
+	val sessionStart = remember { System.currentTimeMillis() }
 	var sessionId by remember { mutableStateOf<Long?>(null) }
+	var summary by remember { mutableStateOf<SessionSummary?>(null) }
 	LaunchedEffect(Unit) {
-		sessionId = dao.insertSession(
-			SessionEntity(dayId = day.id, startedAt = System.currentTimeMillis())
-		)
+		sessionId = dao.insertSession(SessionEntity(dayId = day.id, startedAt = sessionStart))
 	}
 
 	// Gym sessions outlive the screen timeout — keep the display on.
@@ -104,12 +110,38 @@ fun SessionScreen(dayId: String, onExit: () -> Unit) {
 	val finish: () -> Unit = {
 		RestTimer.cancel(context)
 		scope.launch {
-			sessionId?.let { sid ->
-				if (dao.setsForSession(sid).isEmpty()) dao.deleteSession(sid)
-				else dao.endSession(sid, System.currentTimeMillis())
+			val sid = sessionId
+			val sets = sid?.let { dao.setsForSession(it) }.orEmpty()
+			if (sets.isEmpty()) {
+				sid?.let { dao.deleteSession(it) }
+				onExit()
+			} else {
+				summary = SessionSummary(
+					durationMin = ((System.currentTimeMillis() - sessionStart) / 60_000).toInt(),
+					volumeKg = sets.sumOf { it.weightKg * it.reps },
+					setCount = sets.size,
+					rows = sets.groupBy { it.exerciseName }.map { (name, list) ->
+						SummaryRow(
+							name = name,
+							topKg = list.maxOf { it.weightKg },
+							prevTopKg = dao.lastSessionSets(name, sid!!).maxOfOrNull { it.weightKg },
+						)
+					},
+				)
 			}
-			onExit()
 		}
+	}
+
+	summary?.let { s ->
+		SessionSummaryDialog(
+			summary = s,
+			onDone = {
+				scope.launch {
+					sessionId?.let { dao.endSession(it, System.currentTimeMillis()) }
+					onExit()
+				}
+			},
+		)
 	}
 
 	Column(modifier = Modifier.fillMaxSize()) {
@@ -213,6 +245,7 @@ fun SessionScreen(dayId: String, onExit: () -> Unit) {
 @Composable
 private fun RestBar() {
 	val context = LocalContext.current
+	val haptic = LocalHapticFeedback.current
 	val rest by RestTimer.state.collectAsState()
 	val r = rest ?: return
 
@@ -221,6 +254,7 @@ private fun RestBar() {
 		while (true) {
 			nowMs = System.currentTimeMillis()
 			if (nowMs >= r.endAt) {
+				haptic.performHapticFeedback(HapticFeedbackType.LongPress)
 				RestTimer.clearFinished()
 				break
 			}
@@ -322,7 +356,9 @@ private fun SetLogger(
 ) {
 	val context = LocalContext.current
 	val scope = rememberCoroutineScope()
+	val haptic = LocalHapticFeedback.current
 
+	var showProgress by remember(exercise.name) { mutableStateOf(false) }
 	var logged by remember(exercise.name, sessionId) { mutableStateOf<List<SetLogEntity>>(emptyList()) }
 	var lastTime by remember(exercise.name) { mutableStateOf<List<SetLogEntity>>(emptyList()) }
 	var weightText by rememberSaveable(exercise.name) { mutableStateOf("") }
@@ -342,12 +378,30 @@ private fun SetLogger(
 	Spacer(Modifier.height(10.dp))
 	Text(
 		text = "last time · " +
-			if (lastTime.isEmpty()) "—"
-			else lastTime.joinToString("   ") { fmtSet(it.weightKg, it.reps) },
+			(if (lastTime.isEmpty()) "—"
+			else lastTime.joinToString("   ") { fmtSet(it.weightKg, it.reps) }) +
+			"   📈",
 		style = MaterialTheme.typography.bodySmall,
 		color = Dim,
+		modifier = Modifier.clickable { showProgress = true },
 	)
+	if (
+		lastTime.isNotEmpty() &&
+		lastTime.all { it.reps >= REPS_TARGET } &&
+		lastTime.last().weightKg > 0.0
+	) {
+		Spacer(Modifier.height(4.dp))
+		Text(
+			"hit $REPS_TARGET+ reps on every set last time — try +2.5 kg",
+			style = MaterialTheme.typography.bodySmall,
+			color = Warn,
+		)
+	}
 	Spacer(Modifier.height(6.dp))
+
+	if (showProgress) {
+		ExerciseProgressDialog(exercise = exercise, dao = dao, onClose = { showProgress = false })
+	}
 
 	logged.forEachIndexed { index, set ->
 		Row(
@@ -412,6 +466,7 @@ private fun SetLogger(
 						val id = dao.insertSet(entity)
 						logged = logged + entity.copy(id = id)
 					}
+					haptic.performHapticFeedback(HapticFeedbackType.LongPress)
 					RestTimer.start(context, exercise.restSeconds, exercise.name)
 				}
 			},
@@ -425,4 +480,90 @@ private fun SetLogger(
 private fun blockName(block: Block): String = when (block) {
 	is Single -> block.exercise.name
 	is Superset -> "${block.a.name} ⇄ ${block.b.name}"
+}
+
+// A last session where every set hit this many reps earns a "+2.5 kg" hint.
+private const val REPS_TARGET = 12
+
+private data class SummaryRow(val name: String, val topKg: Double, val prevTopKg: Double?)
+
+private data class SessionSummary(
+	val durationMin: Int,
+	val volumeKg: Double,
+	val setCount: Int,
+	val rows: List<SummaryRow>,
+)
+
+@Composable
+private fun SessionSummaryDialog(summary: SessionSummary, onDone: () -> Unit) {
+	AlertDialog(
+		onDismissRequest = onDone,
+		containerColor = CardBg,
+		title = { Text("Session done 💪") },
+		text = {
+			Column {
+				Text(
+					"${summary.durationMin} min · ${summary.setCount} sets · " +
+						"${summary.volumeKg.toInt()} kg total volume",
+					style = MaterialTheme.typography.bodyMedium,
+					color = Dim,
+				)
+				Spacer(Modifier.height(12.dp))
+				summary.rows.forEach { row ->
+					val delta = row.prevTopKg?.let { row.topKg - it }
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.SpaceBetween,
+					) {
+						Text(
+							row.name,
+							style = MaterialTheme.typography.bodyMedium,
+							modifier = Modifier.weight(1f),
+						)
+						Text(
+							text = when {
+								delta == null -> "${fmtWeight(row.topKg)} kg · new"
+								delta > 0 -> "${fmtWeight(row.topKg)} kg ↑${fmtWeight(delta)}"
+								delta < 0 -> "${fmtWeight(row.topKg)} kg ↓${fmtWeight(-delta)}"
+								else -> "${fmtWeight(row.topKg)} kg ="
+							},
+							style = MaterialTheme.typography.bodyMedium,
+							color = when {
+								delta == null -> Dim
+								delta > 0 -> Accent
+								delta < 0 -> Danger
+								else -> Dim
+							},
+						)
+					}
+					Spacer(Modifier.height(4.dp))
+				}
+			}
+		},
+		confirmButton = { TextButton(onClick = onDone) { Text("Done") } },
+	)
+}
+
+@Composable
+private fun ExerciseProgressDialog(exercise: Exercise, dao: WorkoutDao, onClose: () -> Unit) {
+	val points by produceState<List<ProgressPoint>?>(initialValue = null, exercise.name) {
+		value = dao.progressFor(exercise.name)
+	}
+	AlertDialog(
+		onDismissRequest = onClose,
+		containerColor = CardBg,
+		title = { Text(exercise.name) },
+		text = {
+			val p = points
+			when {
+				p == null -> Text("Loading…", color = Dim)
+				p.size < 2 -> Text(
+					"Not enough sessions yet — log this exercise a few more times to see the trend.",
+					color = Dim,
+				)
+				else -> ProgressChart(points = p, color = muscleColor(exercise.muscle))
+			}
+		},
+		confirmButton = { TextButton(onClick = onClose) { Text("Close") } },
+	)
 }

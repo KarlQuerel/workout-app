@@ -5,6 +5,9 @@ import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
+// Top-set weight of one exercise in one session — a point on its progress chart.
+data class ProgressPoint(val ts: Long, val w: Double)
+
 @Dao
 interface WorkoutDao {
 	@Insert
@@ -30,6 +33,17 @@ interface WorkoutDao {
 		ORDER BY id"""
 	)
 	suspend fun lastSessionSets(name: String, excludeSessionId: Long): List<SetLogEntity>
+
+	@Query(
+		"""SELECT s.startedAt AS ts, MAX(l.weightKg) AS w FROM set_logs l
+		JOIN sessions s ON s.id = l.sessionId
+		WHERE l.exerciseName = :name
+		GROUP BY l.sessionId ORDER BY s.startedAt"""
+	)
+	suspend fun progressFor(name: String): List<ProgressPoint>
+
+	@Query("SELECT * FROM set_logs ORDER BY loggedAt")
+	suspend fun allSets(): List<SetLogEntity>
 
 	@Query("SELECT * FROM sessions ORDER BY startedAt DESC")
 	fun sessions(): Flow<List<SessionEntity>>
