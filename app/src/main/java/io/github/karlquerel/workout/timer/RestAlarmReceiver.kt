@@ -32,11 +32,10 @@ class RestAlarmReceiver : BroadcastReceiver() {
 			.build()
 
 		context.getSystemService(NotificationManager::class.java)
-			.notify(NOTIFICATION_ID, notification)
+			.notify(RestTimer.NOTIFICATION_ID, notification)
 	}
 
 	companion object {
 		const val EXTRA_LABEL = "label"
-		private const val NOTIFICATION_ID = 1
 	}
 }

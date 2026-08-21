@@ -29,10 +29,23 @@ class WorkoutApp : Application() {
 			enableVibration(true)
 			vibrationPattern = longArrayOf(0, 400, 200, 400, 200, 600)
 		}
-		getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+		// Silent channel for the ongoing lock-screen countdown — no beep per set.
+		val progressChannel = NotificationChannel(
+			REST_PROGRESS_CHANNEL_ID,
+			getString(R.string.rest_progress_channel_name),
+			NotificationManager.IMPORTANCE_LOW,
+		).apply {
+			lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+		}
+
+		getSystemService(NotificationManager::class.java).let {
+			it.createNotificationChannel(channel)
+			it.createNotificationChannel(progressChannel)
+		}
 	}
 
 	companion object {
 		const val REST_CHANNEL_ID = "rest_timer"
+		const val REST_PROGRESS_CHANNEL_ID = "rest_progress"
 	}
 }

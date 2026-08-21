@@ -1,10 +1,15 @@
 package io.github.karlquerel.workout.timer
 
 import android.app.AlarmManager
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.core.app.NotificationCompat
+import io.github.karlquerel.workout.MainActivity
+import io.github.karlquerel.workout.R
+import io.github.karlquerel.workout.WorkoutApp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -18,6 +23,7 @@ data class RestState(
 // the "rest over" notification fires even when the screen is locked.
 object RestTimer {
 	private const val REQUEST_CODE = 1001
+	const val NOTIFICATION_ID = 1
 
 	private val _state = MutableStateFlow<RestState?>(null)
 	val state: StateFlow<RestState?> = _state
@@ -33,12 +39,42 @@ object RestTimer {
 		} else {
 			alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, endAt, pending)
 		}
+
+		postCountdownNotification(context, label, endAt)
 	}
 
 	fun cancel(context: Context) {
 		val label = _state.value?.label ?: return
 		_state.value = null
 		context.getSystemService(AlarmManager::class.java).cancel(pendingIntent(context, label))
+		context.getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
+	}
+
+	// Live countdown on the lock screen and status bar while resting; the
+	// alarm notification replaces it (same id) when the timer fires.
+	private fun postCountdownNotification(context: Context, label: String, endAt: Long) {
+		val tapIntent = PendingIntent.getActivity(
+			context,
+			0,
+			Intent(context, MainActivity::class.java),
+			PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+		)
+		val notification = NotificationCompat.Builder(context, WorkoutApp.REST_PROGRESS_CHANNEL_ID)
+			.setSmallIcon(R.drawable.ic_notification)
+			.setContentTitle(context.getString(R.string.resting_title))
+			.setContentText(label)
+			.setOngoing(true)
+			.setOnlyAlertOnce(true)
+			.setShowWhen(true)
+			.setWhen(endAt)
+			.setUsesChronometer(true)
+			.setChronometerCountDown(true)
+			.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+			.setCategory(NotificationCompat.CATEGORY_STOPWATCH)
+			.setContentIntent(tapIntent)
+			.build()
+		context.getSystemService(NotificationManager::class.java)
+			.notify(NOTIFICATION_ID, notification)
 	}
 
 	fun clearFinished() {

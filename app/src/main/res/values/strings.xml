@@ -2,5 +2,7 @@
 <resources>
 	<string name="app_name">Split</string>
 	<string name="rest_channel_name">Rest timer</string>
+	<string name="rest_progress_channel_name">Rest countdown</string>
+	<string name="resting_title">Resting</string>
 	<string name="rest_over_title">Rest over — back to work</string>
 </resources>
