@@ -91,7 +91,7 @@ fun HistoryScreen(onBack: () -> Unit) {
 							}
 							val send = Intent(Intent.ACTION_SEND).apply {
 								type = "text/plain"
-								putExtra(Intent.EXTRA_SUBJECT, "split workout log")
+								putExtra(Intent.EXTRA_SUBJECT, "workout log")
 								putExtra(Intent.EXTRA_TEXT, csv)
 							}
 							context.startActivity(Intent.createChooser(send, "Export log"))

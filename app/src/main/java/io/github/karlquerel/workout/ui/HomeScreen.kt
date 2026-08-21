@@ -48,7 +48,7 @@ fun HomeScreen(onStartDay: (String) -> Unit, onHistory: () -> Unit) {
 			.padding(20.dp),
 	) {
 		Row(verticalAlignment = Alignment.Bottom) {
-			Text("split", fontFamily = PixelFont, fontSize = 46.sp, color = Accent)
+			Text("workout", fontFamily = PixelFont, fontSize = 46.sp, color = Accent)
 			BlinkingCursor()
 		}
 		Text(

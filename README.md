@@ -1,4 +1,4 @@
-# Split — workout tracker
+# Workout — gym tracker
 
 Native Android app (Kotlin + Jetpack Compose) for tracking gym sessions:
 the weekly split from [karlquerel.github.io/sport](https://karlquerel.github.io/sport),

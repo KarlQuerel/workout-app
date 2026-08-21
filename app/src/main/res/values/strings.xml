@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Split</string>
+	<string name="app_name">Workout</string>
 	<string name="rest_channel_name">Rest timer</string>
 	<string name="rest_progress_channel_name">Rest countdown</string>
 	<string name="resting_title">Resting</string>
