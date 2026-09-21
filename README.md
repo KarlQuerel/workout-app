@@ -1,50 +1,21 @@
-# Workout — gym tracker
+# Workout
 
-Native Android app (Kotlin + Jetpack Compose) for tracking gym sessions:
-the weekly split from [karlquerel.github.io/sport](https://karlquerel.github.io/sport),
-set-by-set weight/rep logging, rest timers with lock-screen alarms, and
-per-exercise history — all stored on-device (Room), fully offline.
+Native Android gym tracker: weekly split, set-by-set logging, rest timers with
+lock-screen alarms, per-exercise history and progress charts. Fully offline, no account,
+no analytics, and no `INTERNET` permission, so training data cannot leave the phone.
 
-## Structure
+## Stack
 
-```
-app/src/main/java/io/github/karlquerel/workout/
-  data/Program.kt        # the weekly split — edit exercises/rest times here
-  data/db/               # Room: sessions + set logs
-  timer/                 # rest timer state + exact-alarm notification
-  ui/                    # Compose screens: Home, Session, History
-  ui/theme/              # void palette + monospace typography
-```
+Kotlin, Jetpack Compose (Material 3), Room, Navigation Compose.
+minSdk 26, targetSdk 36, AGP 8.13.2 / Gradle 8.13, JDK 17+.
 
-## Requirements
+Build, release and migration instructions: [docs/BUILDING.md](docs/BUILDING.md).
 
-- JDK 17+ (`java -version`)
-- Android SDK at `~/Android/Sdk` (path set in `local.properties`, not committed).
-  Installed via cmdline-tools: `platform-tools`, `platforms;android-35`, `build-tools;35.0.0`.
+## Legal
 
-## Build
-
-```bash
-./gradlew assembleDebug        # APK at app/build/outputs/apk/debug/app-debug.apk
-```
-
-## Install on the phone
-
-One-time phone setup: Settings → About phone → tap "Build number" 7× to enable
-Developer options, then enable **USB debugging**. Plug in over USB and accept
-the fingerprint prompt.
-
-```bash
-./gradlew installDebug         # build + install over USB
-# or: adb install -r app/build/outputs/apk/debug/app-debug.apk
-```
-
-Re-run the same command to update the app after changes — data survives reinstalls.
-
-## Notes
-
-- Rest alarms use exact alarms (`USE_EXACT_ALARM`) + an alarm-sound notification
-  channel, so they fire even when the screen is locked.
-- The session screen keeps the display awake; ending a session with no logged
-  sets discards it.
-- Editing the program = editing `data/Program.kt` and reinstalling.
+- **Privacy policy**: [docs/privacy-policy.html](docs/privacy-policy.html). The app
+  collects, transmits and shares nothing; everything you log stays on the device.
+- **VT323 font** (`app/src/main/res/font/vt323.ttf`): Copyright 2011, The VT323 Project
+  Authors (peter.hull@oikoi.com), licensed under the SIL Open Font License 1.1. Full text
+  in [licenses/VT323-OFL.txt](licenses/VT323-OFL.txt).
+- **This project ships no license file**, so all rights are reserved by default.

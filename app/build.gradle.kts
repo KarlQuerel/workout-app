@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
 	alias(libs.plugins.android.application)
 	alias(libs.plugins.kotlin.android)
@@ -5,21 +7,44 @@ plugins {
 	alias(libs.plugins.ksp)
 }
 
+// Upload-key material: keystore.properties (gitignored) locally, env vars in CI.
+val keystoreProperties = Properties().apply {
+	val file = rootProject.file("keystore.properties")
+	if (file.exists()) file.inputStream().use { load(it) }
+}
+
+fun signingValue(key: String, env: String): String? =
+	keystoreProperties.getProperty(key) ?: System.getenv(env)
+
 android {
 	namespace = "io.github.karlquerel.workout"
-	compileSdk = 35
+	compileSdk = 36
 
 	defaultConfig {
 		applicationId = "io.github.karlquerel.workout"
 		minSdk = 26
-		targetSdk = 35
+		targetSdk = 36
 		versionCode = 3
 		versionName = "1.3"
+	}
+
+	signingConfigs {
+		create("release") {
+			val store = signingValue("storeFile", "WORKOUT_STORE_FILE")
+			if (store != null) {
+				storeFile = rootProject.file(store)
+				storePassword = signingValue("storePassword", "WORKOUT_STORE_PASSWORD")
+				keyAlias = signingValue("keyAlias", "WORKOUT_KEY_ALIAS")
+				keyPassword = signingValue("keyPassword", "WORKOUT_KEY_PASSWORD")
+			}
+		}
 	}
 
 	buildTypes {
 		release {
 			isMinifyEnabled = false
+			// Left unsigned when no keystore is configured, so a bare clone still builds.
+			signingConfig = signingConfigs.getByName("release").takeIf { it.storeFile != null }
 		}
 	}
 
@@ -35,6 +60,11 @@ android {
 	buildFeatures {
 		compose = true
 	}
+}
+
+// Room schemas are committed so every version bump has a diffable, migratable reference.
+ksp {
+	arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {

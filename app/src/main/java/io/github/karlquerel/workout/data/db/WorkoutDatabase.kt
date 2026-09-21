@@ -25,7 +25,7 @@ data class SetLogEntity(
 	val loggedAt: Long,
 )
 
-@Database(entities = [SessionEntity::class, SetLogEntity::class], version = 1, exportSchema = false)
+@Database(entities = [SessionEntity::class, SetLogEntity::class], version = 1, exportSchema = true)
 abstract class WorkoutDatabase : RoomDatabase() {
 	abstract fun dao(): WorkoutDao
 
@@ -39,7 +39,7 @@ abstract class WorkoutDatabase : RoomDatabase() {
 					context.applicationContext,
 					WorkoutDatabase::class.java,
 					"workout.db",
-				).build().also { instance = it }
+				).addMigrations(*MIGRATIONS).build().also { instance = it }
 			}
 	}
 }
