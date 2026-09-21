@@ -4,13 +4,8 @@
 	android:height="108dp"
 	android:viewportWidth="108"
 	android:viewportHeight="108">
-	<group
-		android:scaleX="2.2"
-		android:scaleY="2.2"
-		android:translateX="27.6"
-		android:translateY="27.6">
-		<path
-			android:fillColor="#4ADE80"
-			android:pathData="M1,10h2v4h-2z M4,8h2v8h-2z M7,11h10v2h-10z M18,8h2v8h-2z M21,10h2v4h-2z" />
-	</group>
+	<!-- Barbell kept inside the 72dp safe zone so masks never clip the outer plates. -->
+	<path
+		android:fillColor="#4ADE80"
+		android:pathData="M26,49h56v10h-56z M28,33h10v42h-10z M70,33h10v42h-10z M20,43h7v22h-7z M81,43h7v22h-7z" />
 </vector>
