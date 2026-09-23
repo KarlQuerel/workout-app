@@ -11,10 +11,20 @@
 ```
 app/src/main/java/io/github/karlquerel/workout/
   data/Program.kt        # the weekly split - edit exercises/rest times here
+  data/Stats.kt          # muscle load, weekly volume, streak (home tiles)
   data/db/               # Room: sessions + set logs, schemas, migrations
   timer/                 # rest timer state + exact-alarm notification
-  ui/                    # Compose screens: Home, Session, History
-  ui/theme/              # void palette + monospace typography
+  ui/                    # Compose screens: Home, Session, History, BodyMap
+  ui/theme/              # Performance palette (heat scale) + Geist typography
+```
+
+## Icon and store graphics
+
+The launcher icon layers, notification icon and Play Store graphics are all generated from one
+script, so edit the mark there and rerun it:
+
+```bash
+uv run --with fonttools --with pillow python tools/store_assets.py
 ```
 
 ## Build and install

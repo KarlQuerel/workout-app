@@ -15,7 +15,10 @@ Build, release and migration instructions: [docs/BUILDING.md](docs/BUILDING.md).
 
 - **Privacy policy**: [docs/privacy-policy.html](docs/privacy-policy.html). The app
   collects, transmits and shares nothing; everything you log stays on the device.
-- **VT323 font** (`app/src/main/res/font/vt323.ttf`): Copyright 2011, The VT323 Project
-  Authors (peter.hull@oikoi.com), licensed under the SIL Open Font License 1.1. Full text
-  in [licenses/VT323-OFL.txt](licenses/VT323-OFL.txt).
+- **Geist and Geist Mono fonts** (`app/src/main/res/font/geist.ttf`, `geist_mono.ttf`): Copyright
+  2024, The Geist Project Authors, licensed under the SIL Open Font License 1.1. Full text in
+  [licenses/Geist-OFL.txt](licenses/Geist-OFL.txt) and [licenses/GeistMono-OFL.txt](licenses/GeistMono-OFL.txt).
+- **Archivo font** (`tools/fonts/Archivo-Italic.ttf`, used to generate the icon and store graphics):
+  Copyright 2020, The Archivo Project Authors, licensed under the SIL Open Font License 1.1.
+  Full text in [licenses/Archivo-OFL.txt](licenses/Archivo-OFL.txt).
 - **This project ships no license file**, so all rights are reserved by default.
