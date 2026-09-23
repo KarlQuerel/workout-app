@@ -29,8 +29,21 @@ object RestTimer {
 	val state: StateFlow<RestState?> = _state
 
 	fun start(context: Context, seconds: Int, label: String) {
-		val endAt = System.currentTimeMillis() + seconds * 1000L
-		_state.value = RestState(label = label, endAt = endAt, totalSeconds = seconds)
+		schedule(context, RestState(label, System.currentTimeMillis() + seconds * 1000L, seconds))
+	}
+
+	fun extend(context: Context, seconds: Int) {
+		val current = _state.value ?: return
+		schedule(
+			context,
+			current.copy(endAt = current.endAt + seconds * 1000L, totalSeconds = current.totalSeconds + seconds),
+		)
+	}
+
+	private fun schedule(context: Context, rest: RestState) {
+		_state.value = rest
+		val label = rest.label
+		val endAt = rest.endAt
 
 		val alarmManager = context.getSystemService(AlarmManager::class.java)
 		val pending = pendingIntent(context, label)
