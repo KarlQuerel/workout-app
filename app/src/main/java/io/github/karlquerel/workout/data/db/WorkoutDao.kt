@@ -48,6 +48,17 @@ interface WorkoutDao {
 	@Query("SELECT * FROM sessions ORDER BY startedAt DESC")
 	fun sessions(): Flow<List<SessionEntity>>
 
+	@Query("SELECT * FROM set_logs WHERE loggedAt >= :since ORDER BY loggedAt")
+	fun setsSince(since: Long): Flow<List<SetLogEntity>>
+
+	// Only sessions with at least one set count as workouts.
+	@Query(
+		"""SELECT * FROM sessions s
+		WHERE EXISTS (SELECT 1 FROM set_logs l WHERE l.sessionId = s.id)
+		ORDER BY startedAt DESC"""
+	)
+	fun loggedSessions(): Flow<List<SessionEntity>>
+
 	@Query("SELECT * FROM set_logs WHERE sessionId = :sessionId ORDER BY id")
 	suspend fun setsForSession(sessionId: Long): List<SetLogEntity>
 
