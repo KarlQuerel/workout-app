@@ -24,7 +24,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,10 +31,10 @@ import io.github.karlquerel.workout.WorkoutApp
 import io.github.karlquerel.workout.data.dayById
 import io.github.karlquerel.workout.data.db.SessionEntity
 import io.github.karlquerel.workout.data.db.SetLogEntity
-import io.github.karlquerel.workout.ui.theme.Accent
+import io.github.karlquerel.workout.ui.theme.Heat
+import io.github.karlquerel.workout.ui.theme.Ink
 import io.github.karlquerel.workout.ui.theme.Danger
 import io.github.karlquerel.workout.ui.theme.Dim
-import io.github.karlquerel.workout.ui.theme.muscleColor
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -109,7 +108,7 @@ fun HistoryScreen(onBack: () -> Unit) {
 			Text("No sessions logged yet.", style = MaterialTheme.typography.bodyMedium, color = Dim)
 		}
 
-		LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+		LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 			items(sessions, key = { it.id }) { session ->
 				SessionRow(
 					session = session,
@@ -140,19 +139,18 @@ private fun SessionRow(
 	onDelete: () -> Unit,
 ) {
 	val day = dayById(session.dayId)
-	val accent: Color = day?.let { muscleColor(it.accent) } ?: Dim
 	val date = Instant.ofEpochMilli(session.startedAt)
 		.atZone(ZoneId.systemDefault())
 		.format(DATE_FMT)
 
-	AccentCard(accent = accent, onClick = onToggle) {
+	TileCard(Modifier.fillMaxWidth(), onClick = onToggle) {
 		Row(
 			modifier = Modifier.fillMaxWidth(),
 			horizontalArrangement = Arrangement.SpaceBetween,
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			Text(date, style = MaterialTheme.typography.bodyMedium)
-			Text(day?.kind ?: session.dayId, style = MaterialTheme.typography.labelLarge, color = accent)
+			Text(day?.kind ?: session.dayId, style = MaterialTheme.typography.labelLarge, color = Heat)
 		}
 
 		if (expanded) {
@@ -169,7 +167,7 @@ private fun SessionRow(
 				Text(
 					list.joinToString("   ") { fmtSet(it.weightKg, it.reps) },
 					style = MaterialTheme.typography.bodyMedium,
-					color = Accent,
+					color = Ink,
 				)
 				Spacer(Modifier.height(6.dp))
 			}

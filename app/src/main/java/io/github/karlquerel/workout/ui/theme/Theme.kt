@@ -4,56 +4,105 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import io.github.karlquerel.workout.R
-import io.github.karlquerel.workout.data.Effort
-import io.github.karlquerel.workout.data.Muscle
 
-// Dark gym console: near-black ground, one energetic accent, color-coded muscles.
-val Bg = Color(0xFF0B0F14)
-val CardBg = Color(0xFF151C24)
-val InkHi = Color(0xFFE8EDF3)
-val Dim = Color(0xFF8B98A7)
-val Line = Color(0xFF243039)
-val Accent = Color(0xFF4ADE80)
-val Warn = Color(0xFFF5C842)
+val Bg = Color(0xFF0B0C0E)
+val Tile = Color(0xFF16181B)
+val TileRaised = Color(0xFF1D2024)
+val Control = Color(0xFF25282C)
+val Ink = Color(0xFFF4F5F6)
+val Dim = Color(0xFFA3A8AE)
+val Faint = Color(0xFF7D828A)
+val Heat = Color(0xFFFF5A1F)
+val Amber = Color(0xFFFFB020)
+val Better = Color(0xFF7EE0A1)
 val Danger = Color(0xFFF87171)
+val OnHeat = Color(0xFF1B0A00)
 
-// Pixel display font — reserved for the timer digits and the brand mark.
-val PixelFont = FontFamily(Font(R.font.vt323))
+val HeatBrush = Brush.linearGradient(listOf(Heat, Amber))
 
-fun muscleColor(muscle: Muscle): Color = when (muscle) {
-	Muscle.CHEST -> Color(0xFF3B9EFF)
-	Muscle.BACK -> Color(0xFFFF7C38)
-	Muscle.TRICEPS -> Color(0xFFB56BFF)
-	Muscle.BICEPS -> Color(0xFF2FCC8B)
-	Muscle.SHOULDERS -> Color(0xFFFF4F8B)
-	Muscle.LEGS -> Color(0xFFF5C842)
-	Muscle.ABS -> Color(0xFF35D4FF)
-	Muscle.WAIST -> Color(0xFF9EFF6B)
-	Muscle.FOREARMS -> Color(0xFFFFB347)
+// Muscle-map shading by working sets over the last 7 days.
+val LoadCold = Color(0xFF2A2E34)
+val LoadLow = Color(0xFF5E3524)
+val LoadMid = Color(0xFFB8481C)
+val LoadHot = Heat
+val BodySkin = Color(0xFF3A3F46)
+
+fun loadColor(sets: Int): Color = when {
+	sets <= 0 -> LoadCold
+	sets < 6 -> LoadLow
+	sets < 12 -> LoadMid
+	else -> LoadHot
 }
 
-fun effortColor(effort: Effort): Color = when (effort) {
-	Effort.EASY -> Color(0xFF2FCC8B)
-	Effort.MEDIUM -> Warn
-	Effort.HARD -> Danger
+@OptIn(ExperimentalTextApi::class)
+private fun geist(weight: FontWeight) =
+	Font(R.font.geist, weight, variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)))
+
+val Geist = FontFamily(
+	geist(FontWeight.Normal),
+	geist(FontWeight.Medium),
+	geist(FontWeight.SemiBold),
+	geist(FontWeight.Bold),
+)
+
+@OptIn(ExperimentalTextApi::class)
+val GeistMono = FontFamily(
+	Font(
+		R.font.geist_mono,
+		FontWeight.Normal,
+		variationSettings = FontVariation.Settings(FontVariation.weight(FontWeight.Normal.weight)),
+	),
+)
+
+// Weights and timers tick in place instead of jittering.
+val Numeric = TextStyle(fontFamily = Geist, fontFeatureSettings = "tnum")
+
+val Kicker = TextStyle(fontFamily = GeistMono, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Faint)
+
+private fun TextStyle.geist() = copy(fontFamily = Geist)
+
+private val AppTypography = Typography().run {
+	copy(
+		displayLarge = displayLarge.geist(),
+		displayMedium = displayMedium.geist(),
+		displaySmall = displaySmall.geist(),
+		headlineLarge = headlineLarge.geist(),
+		headlineMedium = headlineMedium.geist(),
+		headlineSmall = headlineSmall.geist().copy(fontWeight = FontWeight.SemiBold, letterSpacing = (-0.3).sp),
+		titleLarge = titleLarge.geist().copy(fontWeight = FontWeight.SemiBold),
+		titleMedium = titleMedium.geist().copy(fontWeight = FontWeight.SemiBold),
+		titleSmall = titleSmall.geist(),
+		bodyLarge = bodyLarge.geist(),
+		bodyMedium = bodyMedium.geist(),
+		bodySmall = bodySmall.geist(),
+		labelLarge = labelLarge.geist().copy(fontWeight = FontWeight.SemiBold),
+		labelMedium = labelMedium.geist(),
+		labelSmall = labelSmall.geist(),
+	)
 }
 
-private val ConsoleColorScheme = darkColorScheme(
-	primary = Accent,
-	onPrimary = Color(0xFF03240F),
-	secondary = Warn,
-	onSecondary = Color(0xFF2A2005),
+private val PerformanceColorScheme = darkColorScheme(
+	primary = Heat,
+	onPrimary = OnHeat,
+	secondary = Amber,
+	onSecondary = OnHeat,
 	background = Bg,
-	onBackground = InkHi,
-	surface = CardBg,
-	onSurface = InkHi,
-	surfaceVariant = CardBg,
+	onBackground = Ink,
+	surface = Tile,
+	onSurface = Ink,
+	surfaceVariant = Control,
 	onSurfaceVariant = Dim,
-	outline = Line,
+	outline = Control,
 	error = Danger,
 	onError = Color(0xFF300B0B),
 )
@@ -61,8 +110,8 @@ private val ConsoleColorScheme = darkColorScheme(
 @Composable
 fun WorkoutTheme(content: @Composable () -> Unit) {
 	MaterialTheme(
-		colorScheme = ConsoleColorScheme,
-		typography = Typography(),
+		colorScheme = PerformanceColorScheme,
+		typography = AppTypography,
 		content = content,
 	)
 }
