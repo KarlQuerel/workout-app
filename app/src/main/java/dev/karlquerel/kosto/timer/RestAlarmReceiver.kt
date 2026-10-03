@@ -1,4 +1,4 @@
-package io.github.karlquerel.workout.timer
+package dev.karlquerel.kosto.timer
 
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -6,9 +6,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
-import io.github.karlquerel.workout.MainActivity
-import io.github.karlquerel.workout.R
-import io.github.karlquerel.workout.WorkoutApp
+import dev.karlquerel.kosto.MainActivity
+import dev.karlquerel.kosto.R
+import dev.karlquerel.kosto.WorkoutApp
 
 class RestAlarmReceiver : BroadcastReceiver() {
 	override fun onReceive(context: Context, intent: Intent) {

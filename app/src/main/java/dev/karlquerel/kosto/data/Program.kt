@@ -1,4 +1,4 @@
-package io.github.karlquerel.workout.data
+package dev.karlquerel.kosto.data
 
 import java.time.DayOfWeek
 import java.time.LocalDate

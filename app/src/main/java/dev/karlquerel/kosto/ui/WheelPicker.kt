@@ -1,4 +1,4 @@
-package io.github.karlquerel.workout.ui
+package dev.karlquerel.kosto.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,11 +37,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import io.github.karlquerel.workout.ui.theme.Control
-import io.github.karlquerel.workout.ui.theme.Dim
-import io.github.karlquerel.workout.ui.theme.Ink
-import io.github.karlquerel.workout.ui.theme.Numeric
-import io.github.karlquerel.workout.ui.theme.Tile
+import dev.karlquerel.kosto.ui.theme.Control
+import dev.karlquerel.kosto.ui.theme.Dim
+import dev.karlquerel.kosto.ui.theme.Ink
+import dev.karlquerel.kosto.ui.theme.Numeric
+import dev.karlquerel.kosto.ui.theme.Tile
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.roundToInt

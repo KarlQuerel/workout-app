@@ -9,7 +9,7 @@
 ## Structure
 
 ```
-app/src/main/java/io/github/karlquerel/workout/
+app/src/main/java/dev/karlquerel/kosto/
   data/Program.kt        # the weekly split - edit exercises/rest times here
   data/Stats.kt          # muscle load, weekly volume, streak (home tiles)
   data/db/               # Room: sessions + set logs, schemas, migrations

@@ -1,4 +1,4 @@
-package io.github.karlquerel.workout.ui
+package dev.karlquerel.kosto.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -31,17 +31,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.karlquerel.workout.ui.theme.Amber
-import io.github.karlquerel.workout.ui.theme.Control
-import io.github.karlquerel.workout.ui.theme.Danger
-import io.github.karlquerel.workout.ui.theme.Heat
-import io.github.karlquerel.workout.ui.theme.HeatBrush
-import io.github.karlquerel.workout.ui.theme.Ink
-import io.github.karlquerel.workout.ui.theme.Kicker
-import io.github.karlquerel.workout.ui.theme.Numeric
-import io.github.karlquerel.workout.ui.theme.OnHeat
-import io.github.karlquerel.workout.ui.theme.Tile
-import io.github.karlquerel.workout.ui.theme.TileRaised
+import dev.karlquerel.kosto.ui.theme.Amber
+import dev.karlquerel.kosto.ui.theme.Control
+import dev.karlquerel.kosto.ui.theme.Danger
+import dev.karlquerel.kosto.ui.theme.Heat
+import dev.karlquerel.kosto.ui.theme.HeatBrush
+import dev.karlquerel.kosto.ui.theme.Ink
+import dev.karlquerel.kosto.ui.theme.Kicker
+import dev.karlquerel.kosto.ui.theme.Numeric
+import dev.karlquerel.kosto.ui.theme.OnHeat
+import dev.karlquerel.kosto.ui.theme.Tile
+import dev.karlquerel.kosto.ui.theme.TileRaised
 import java.util.Locale
 
 val BUTTON_HEIGHT = 56.dp

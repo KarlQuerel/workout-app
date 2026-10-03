@@ -1,11 +1,11 @@
-package io.github.karlquerel.workout
+package dev.karlquerel.kosto
 
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.media.AudioAttributes
 import android.provider.Settings
-import io.github.karlquerel.workout.data.db.WorkoutDatabase
+import dev.karlquerel.kosto.data.db.WorkoutDatabase
 
 class WorkoutApp : Application() {
 	val database: WorkoutDatabase by lazy { WorkoutDatabase.get(this) }

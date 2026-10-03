@@ -1,4 +1,4 @@
-package io.github.karlquerel.workout
+package dev.karlquerel.kosto
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -18,10 +18,10 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.github.karlquerel.workout.ui.HistoryScreen
-import io.github.karlquerel.workout.ui.HomeScreen
-import io.github.karlquerel.workout.ui.SessionScreen
-import io.github.karlquerel.workout.ui.theme.WorkoutTheme
+import dev.karlquerel.kosto.ui.HistoryScreen
+import dev.karlquerel.kosto.ui.HomeScreen
+import dev.karlquerel.kosto.ui.SessionScreen
+import dev.karlquerel.kosto.ui.theme.WorkoutTheme
 
 class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {

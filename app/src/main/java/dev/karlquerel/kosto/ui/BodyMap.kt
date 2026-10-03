@@ -1,4 +1,4 @@
-package io.github.karlquerel.workout.ui
+package dev.karlquerel.kosto.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
@@ -7,9 +7,9 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import io.github.karlquerel.workout.data.Muscle
-import io.github.karlquerel.workout.ui.theme.BodySkin
-import io.github.karlquerel.workout.ui.theme.LoadCold
+import dev.karlquerel.kosto.data.Muscle
+import dev.karlquerel.kosto.ui.theme.BodySkin
+import dev.karlquerel.kosto.ui.theme.LoadCold
 
 enum class BodySide { FRONT, BACK }
 

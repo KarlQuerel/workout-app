@@ -1,4 +1,4 @@
-package io.github.karlquerel.workout.ui
+package dev.karlquerel.kosto.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import io.github.karlquerel.workout.data.db.ProgressPoint
-import io.github.karlquerel.workout.ui.theme.Dim
+import dev.karlquerel.kosto.data.db.ProgressPoint
+import dev.karlquerel.kosto.ui.theme.Dim
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter

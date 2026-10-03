@@ -1,4 +1,4 @@
-package io.github.karlquerel.workout.data.db
+package dev.karlquerel.kosto.data.db
 
 import android.content.Context
 import androidx.room.Database

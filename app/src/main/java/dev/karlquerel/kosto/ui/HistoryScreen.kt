@@ -1,4 +1,4 @@
-package io.github.karlquerel.workout.ui
+package dev.karlquerel.kosto.ui
 
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
@@ -27,14 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import io.github.karlquerel.workout.WorkoutApp
-import io.github.karlquerel.workout.data.dayById
-import io.github.karlquerel.workout.data.db.SessionEntity
-import io.github.karlquerel.workout.data.db.SetLogEntity
-import io.github.karlquerel.workout.ui.theme.Heat
-import io.github.karlquerel.workout.ui.theme.Ink
-import io.github.karlquerel.workout.ui.theme.Danger
-import io.github.karlquerel.workout.ui.theme.Dim
+import dev.karlquerel.kosto.WorkoutApp
+import dev.karlquerel.kosto.data.dayById
+import dev.karlquerel.kosto.data.db.SessionEntity
+import dev.karlquerel.kosto.data.db.SetLogEntity
+import dev.karlquerel.kosto.ui.theme.Heat
+import dev.karlquerel.kosto.ui.theme.Ink
+import dev.karlquerel.kosto.ui.theme.Danger
+import dev.karlquerel.kosto.ui.theme.Dim
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter

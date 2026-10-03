@@ -1,6 +1,6 @@
-package io.github.karlquerel.workout.data
+package dev.karlquerel.kosto.data
 
-import io.github.karlquerel.workout.data.db.SetLogEntity
+import dev.karlquerel.kosto.data.db.SetLogEntity
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate

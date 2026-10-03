@@ -1,4 +1,4 @@
-package io.github.karlquerel.workout.ui.theme
+package dev.karlquerel.kosto.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import io.github.karlquerel.workout.R
+import dev.karlquerel.kosto.R
 
 val Bg = Color(0xFF0B0C0E)
 val Tile = Color(0xFF16181B)

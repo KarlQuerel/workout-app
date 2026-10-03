@@ -17,11 +17,11 @@ fun signingValue(key: String, env: String): String? =
 	keystoreProperties.getProperty(key) ?: System.getenv(env)
 
 android {
-	namespace = "io.github.karlquerel.workout"
+	namespace = "dev.karlquerel.kosto"
 	compileSdk = 36
 
 	defaultConfig {
-		applicationId = "io.github.karlquerel.workout"
+		applicationId = "dev.karlquerel.kosto"
 		minSdk = 26
 		targetSdk = 36
 		versionCode = 3
