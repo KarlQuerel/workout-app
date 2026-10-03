@@ -25,6 +25,7 @@ APP_DIM = (0xA3, 0xA8, 0xAE)
 
 # The KG mark as designed on the 108-unit adaptive canvas.
 TEXT = "KG"
+APP_NAME = "KOSTO"
 AXES = {"wdth": 118, "wght": 900}
 TEXT_SIZE, TEXT_X, BASELINE = 46, 55, 70
 DOT_X, DOT_Y, DOT_R = 82, 30, 5
@@ -215,10 +216,10 @@ def feature_graphic(font, mark, path):
     draw = ImageDraw.Draw(img)
     size = 120
     title = pil_font(font, size)
-    while draw.textlength("WORKOUT", font=title) > 1024 - 432 - 56:
+    while draw.textlength(APP_NAME, font=title) > 1024 - 432 - 56:
         size -= 2
         title = pil_font(font, size)
-    draw.text((432, 262), "WORKOUT", font=title, fill=APP_INK, anchor="ls")
+    draw.text((432, 262), APP_NAME, font=title, fill=APP_INK, anchor="ls")
     subtitle = pil_font(instance(GEIST, {"wght": 500}), 42)
     draw.text((436, 330), "offline gym tracker", font=subtitle, fill=APP_DIM, anchor="ls")
     for x in range(436, 900):
