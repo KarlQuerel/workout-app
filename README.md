@@ -1,4 +1,4 @@
-# Workout
+# Kosto
 
 Native Android gym tracker: weekly split, set-by-set logging, rest timers with
 lock-screen alarms, per-exercise history and progress charts. Fully offline, no account,

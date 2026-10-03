@@ -2,7 +2,9 @@
 
 ## Store listing
 
-- **App name**: `Workout`
+- **App name** (store title, 30 char max, editable later): `Kosto: Gym Log & Rest Timer`
+- **Launcher label**: `Kosto` (from `app_name` in `strings.xml`)
+- **Tagline**: `Weight for it`
 - **Category**: Health & Fitness
 - **Tags**: fitness, workout tracker, strength training
 - **Contact email**: karl.querel@gmail.com
@@ -18,7 +20,7 @@ Offline gym tracker: weekly split, set logging, rest timers with alarms.
 ### Full description (4000 char max)
 
 ```
-Workout is a no-nonsense gym tracker that works entirely offline.
+Kosto is a no-nonsense gym tracker that works entirely offline.
 
 Open the app, pick today's session from your weekly split, and log every set as you go: weight, repetitions, and how hard it felt. Between sets, the rest timer runs a live countdown in your notifications and fires an alarm when it is time to get back under the bar, even with the screen locked and the phone in your pocket.
 
